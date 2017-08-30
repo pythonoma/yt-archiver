@@ -2,7 +2,7 @@
 
 VPS intial setup:
 ```
-curl -L https://raw.githubusercontent.com/pythonoma/yt-archiver/master/install.sh
+curl -L https://raw.githubusercontent.com/pythonoma/yt-archiver/master/install.sh -o install.sh
 chmod a+rx install.sh
 ./install.sh
 ```
