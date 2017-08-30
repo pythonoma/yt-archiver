@@ -36,3 +36,11 @@ echo "Installing internetarchive...";
 echo "-----------------------------";
 eval 'pip install internetarchive';
 eval 'pip3 install internetarchive';
+
+echo "=================================";
+echo "Installing yt-archiver...";
+echo "-----------------------------";
+eval 'curl -L https://raw.githubusercontent.com/pythonoma/yt-archiver/master/yt_archiver.py -o /usr/bin/yt_archiver.py';
+eval 'curl -L https://raw.githubusercontent.com/pythonoma/yt-archiver/master/archive_uploader.py -o /usr/bin/archive_uploader.py';
+eval 'curl -L https://raw.githubusercontent.com/pythonoma/yt-archiver/master/yt_downloader.py -o /usr/bin/yt_downloader.py';
+eval 'chmod a+rx /usr/bin/yt_archiver.py';
