@@ -8,15 +8,10 @@ echo "-------------------";
 eval 'apt-get -y upgrade';
 
 echo "=================================";
-echo "Installing pip3 ...";
-echo "-------------------";
-eval 'apt install '
-
-echo "=================================";
 echo "Installing pip, pip3 & unzip ...";
 echo "-----------------";
 eval 'apt-get -y install unzip python-pip python3-pip';
-eval 'pip install -U pip'
+eval 'pip install --upgrade pip'
 
 echo "=================================";
 echo "Installing aria2 ...";
