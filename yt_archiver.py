@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import yt_downloader
 import archive_uploader
 import argparse
