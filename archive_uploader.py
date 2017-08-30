@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from internetarchive import get_item, upload
 
 def create_identifier( identifier):
