@@ -6,12 +6,13 @@ curl -L https://raw.githubusercontent.com/pythonoma/yt-archiver/master/install.s
 chmod a+rx install.sh
 ./install.sh
 ```
-===========================================
+-------------------------------------------------
 
 Configure archive.org account:
+
 ```ia configure```
 
-===========================================
+-------------------------------------------------
 
 Run:
 ```
