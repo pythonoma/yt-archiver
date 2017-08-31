@@ -27,3 +27,4 @@ def ar_upload(identifier, files_folder, auto_delete=True, verbose=True):
         item.upload(files_folder+'/', metadata=md, delete=auto_delete, verbose=verbose, checksum=True)
     except:
         print('Error Uploading')
+
