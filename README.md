@@ -7,9 +7,13 @@ chmod a+rx install.sh
 ./install.sh
 ```
 ===========================================
-Install:
+
+Configure archive.org account:
+```ia configure```
+
+===========================================
+
+Run:
 ```
-
-
-yt-archiver.py
+yt-archiver.py -u <Youtube URL> -i <Archive_Page_Identifier>
 ```
