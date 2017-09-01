@@ -12,7 +12,7 @@ Install:
 ```
 curl -L https://raw.githubusercontent.com/pythonoma/yt-archiver/master/yt-archiver-install.sh -o yt-archiver-install.sh
 chmod a+rx yt-archiver-install.sh
-./yt-archiver-install.sh
+sudo ./yt-archiver-install.sh
 ```
 
 Configure archive.org account:
