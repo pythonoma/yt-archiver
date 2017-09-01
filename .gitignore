@@ -1,1 +1,7 @@
 __pycache__/
+.directory
+backup.sh
+__pycache__/archive_uploader.cpython-36.pyc
+__pycache__/yt_downloader.cpython-36.pyc
+__pycache__/archive_uploader.cpython-36.pyc
+__pycache__/yt_downloader.cpython-36.pyc
