@@ -24,6 +24,8 @@ sudo ./yt-archiver-install.sh
 Configure archive.org account:
 ---------------------------------------------------------------------------------
 
+If you don't have account, create one here: https://archive.org/account/login.createaccount.php
+
 ```
 ia configure
 ```
@@ -47,11 +49,14 @@ Then yt-archiver downloads the next 15 GB & uploads them etc.. till whole channe
 Best to run on VPS (fast down/up speeds). 
 --------------------------------------------------------------------------------
 
-**I recommend the ones below which charge you per hour usage starting at 0.007$/hour (yes less than a cent/hour!):**
+**I recommend the ones below which charge you per hour usage **
+you can create a VPS, Backup your youtube videos & destroy the VPS => only charged for the hours you used not the whole month (usually a few cents!).
 
 <a href="https://m.do.co/c/224d827b0d9b">**1. DigitalOcean**</a>
 
 The servers I tested this script on & it works fine (on Ubuntu 16.04 with 5$ droplet).
+
+Droplets (DigitalOcean VPS intances) start at 0.007$/hour (yes less than a cent/hour!):
 
 Get Free 10$ credit when you signup from this link: https://m.do.co/c/224d827b0d9b
 
