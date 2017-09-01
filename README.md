@@ -38,6 +38,28 @@ Run:
 ```
 yt-archiver.py -u <Youtube_URL> -i <Archive_Page_Identifier>
 ```
+file name: uploadDate-Title__videoId__videoFormat
+
+```
+yt-archiver.py -u <Youtube_URL> -i <Archive_Page_Identifier> -hd -hid -hf
+```
+file name: Title
+
+
+```
+yt-archiver.py -u <Youtube_URL> -i <Archive_Page_Identifier> -hd
+```
+file name: Title__videoId__videoFormat
+
+```
+yt-archiver.py -u <Youtube_URL> -i <Archive_Page_Identifier> -hid
+```
+file name: uploadDate-Title__videoFormat
+
+```
+yt-archiver.py -u <Youtube_URL> -i <Archive_Page_Identifier> -hf
+```
+file name: uploadDate-Title__videoId
 
 FAQ:
 ----------------------------------------------------------------------------
