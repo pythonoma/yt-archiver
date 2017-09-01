@@ -1,13 +1,4 @@
 echo "=================================";
-echo "Updating system...";
-eval 'apt-get -y update';
-
-echo "=================================";
-echo "Upgrading system...";
-echo "-------------------";
-eval 'apt-get -y upgrade';
-
-echo "=================================";
 echo "Installing pip, pip3 & unzip ...";
 echo "-----------------";
 eval 'apt-get -y install unzip python-pip python3-pip';
