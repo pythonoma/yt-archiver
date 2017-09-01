@@ -33,11 +33,12 @@ def create_archive_identifier( identifier):
     md = dict(mediatype='movies',)
     try:
         item.upload('__.test', metadata=md, delete=True)
-        # item.modify_metadata(md)
+        item.modify_metadata(md)
         archive_delete(identifier, files='__.test')
         print('Identifier created.')
         return True
-    except:
+    except Exception as ex:
+        print(ex)
         return False
     
 def create_test_file():
