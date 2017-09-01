@@ -6,6 +6,12 @@ yt-archiver is smart & can handle channels with xxxGb of content; when disk spac
 N.b: Downloaded files are uploaded & deleted automatically to save disk space.
 
 
+Update System:
+--------------------------------------------------------------------------------
+```
+sudo apt-get -y update && sudo apt-get -y upgrade
+```
+
 
 Install:
 ---------------------------------------------------------------------------------
@@ -37,4 +43,26 @@ Q: My free disk space is 15 GB & My channel has 50 videos about 50GB in size. Ho
 A: yt-archiver downloads first videos (ex: 1-15 ) till no disk space is left (~15GB), then uploads them to archive.org & deletes them to free disk space. 
 
 Then yt-archiver downloads the next 15 GB & uploads them etc.. till whole channel or playlist is backed up to archive.org
+
+Best to run on VPS (fast down/up speeds). 
+--------------------------------------------------------------------------------
+
+**I recommend the ones below which charge you per hour usage starting at 0.007$/hour (yes less than a cent/hour!):**
+
+<a href="https://m.do.co/c/224d827b0d9b">**1. DigitalOcean**</a>
+
+The servers I tested this script on & it works fine (on Ubuntu 16.04 with 5$ droplet).
+
+Get Free 10$ credit when you signup from this link: https://m.do.co/c/224d827b0d9b
+
+<a href="https://m.do.co/c/224d827b0d9b"><img src="http://i.imgur.com/LVu6P6n.png"></a>
+
+
+<a href="https://www.vultr.com/?ref=7208825">**2. Vultr** </a>
+------------------------------------------------------------------------------------
+Vultr has a 0.004$/hour plan, even less than DigitalOcean (although not always available):
+
+https://www.vultr.com/?ref=7208825
+
+<a href="https://www.vultr.com/?ref=7208825"><img src="https://www.vultr.com/media/banner_1.png" width="728" height="90"></a>
 
