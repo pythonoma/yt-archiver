@@ -80,7 +80,10 @@ def delete_none_completed_videos(ia_id):
     if os.path.exists(dir):
         files = os.listdir(dir)
         for file in files:
-            if file.endswith(".part") or file.endswith(".part.aria2__temp"):
+            # if file.endswith(".part") or file.endswith(".part.aria2__temp"):
+            if not file.endswith(".mp4") or not file.endswith(".webm") or
+               not file.endswith(".3gp") or not file.endswith(".flv") or
+               not file.endswith(".mp3") or not file.endswith(".m4a"):
                 try:
                     os.remove(os.path.join(dir,file))
                 except Exception as ex:
