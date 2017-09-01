@@ -4,6 +4,7 @@ import argparse
 
 from youtube_dl.utils import DownloadError
 from internetarchive import get_item, upload
+from internetarchive import delete as archive_delete
 
 import youtube_dl
 import os
@@ -25,14 +26,16 @@ def create_archive_identifier( identifier):
     """
 
     print('============================')
-    print('Checking if identifier available...')
+    print('Checking if Archive.org identifier available...')
     item = get_item(identifier)
     # print(dir(item))
     create_test_file()
     md = dict(mediatype='movies',)
     try:
         item.upload('__.test', metadata=md, delete=True)
-        print('Identifier available.')
+        # item.modify_metadata(md)
+        archive_delete(identifier, files='__.test')
+        print('Identifier created.')
         return True
     except:
         return False
@@ -46,7 +49,7 @@ def create_test_file():
             f.write('Test File')
     except Exception as ex:
         print(ex)
-        print('Failed to create test file.')
+        print('Failed to create test file at archive.org.')
 
 def upload_to_archive(identifier, files_folder, auto_delete=True, verbose=True):
     """
@@ -173,10 +176,10 @@ def main():
             except DownloadError:
                 print('=======Download Error, may be Disk Full, Uploading to free space...')
                 upload_to_archive(ia_id, downloads_folder)
-            # except Exception as ex:
-            #     print(ex)
-            #     print("Download error occured...")
-            #     break
+            except Exception as ex:
+                print(ex)
+                print("Download error occured...")
+                break
                 
     else:
         print('Identifier Not available please choose another one.')
