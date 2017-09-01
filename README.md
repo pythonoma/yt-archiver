@@ -6,7 +6,6 @@ yt-archiver is smart & can handle channels with xxxGb of content; when disk spac
 N.b: Downloaded files are uploaded & deleted automatically to save disk space.
 
 
----------------------------------------------------------------------------------
 
 Install:
 ---------------------------------------------------------------------------------
@@ -23,7 +22,6 @@ Configure archive.org account:
 ia configure
 ```
 
--------------------------------------------------
 
 Run:
 ---------------------------------------------------------------------------------
