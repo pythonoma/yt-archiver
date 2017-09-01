@@ -3,7 +3,8 @@
 Auto download Youtube channel or playlist & upload it to Archive.org page.
 
 yt-archiver is smart & can handle channels with xxxGb of content; when disk space runs out, it uploads & deletes downloaded files to free disk space. Then continue downloading the channel & uploading etc...
-N.b: Downloaded files are uploaded & deleted automatically to save disk space.
+
+**N.b:** Downloaded files are uploaded & deleted automatically to save disk space.
 
 
 Update System:
@@ -24,7 +25,8 @@ sudo ./yt-archiver-install.sh
 Configure archive.org account:
 ---------------------------------------------------------------------------------
 
-If you don't have account, create one here: https://archive.org/account/login.createaccount.php
+If you don't have account, create one here: <a href="https://archive.org/account/login.createaccount.php" target="_blank">https://archive.org/account/login.createaccount.php</a>
+
 
 ```
 ia configure
