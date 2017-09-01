@@ -8,6 +8,8 @@ echo "=================================";
 echo "Installing aria2 ...";
 echo "-----------------------------";
 eval "apt-get -y install aria2";
+# fix error 22 https://github.com/aria2/aria2/issues/502
+eval "echo 'async-dns=false' >> ~/.aria2/aria2.conf";
 
 echo "=================================";
 echo "Installing youtube-dl...";
