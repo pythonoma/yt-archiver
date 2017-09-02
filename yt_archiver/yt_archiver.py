@@ -224,13 +224,17 @@ def main():
                     print('=======aria2 could not create directory.....')
                     exit 
                     
-                elif ex.find('account associated with this video has been terminated') > -1 :
+                elif ex.find('account associated with this video has been terminated') > -1 or \
+                        ex.find('blocked it on copyright grounds') > -1:
                     video_id_start = ex.find(":") +6
                     video_id_end = ex.find(":", video_id_start)
                     video_id = ex[video_id_start:video_id_end]
                     if video_id != '':
                         skip_yt_video(video_id, ia_id)
                         continue
+                else:
+                    print(ex)
+                    exit
                 # elif ex.find('')
             # except OSError as ex:
             #     if ex.errno is 28:
