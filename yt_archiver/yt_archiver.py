@@ -151,15 +151,25 @@ def print_status_string(ia_id, downloads_path):
         for v in failed_upload_list:
             f.write(v + '\n')
     
+    to_upload_count = 0
+    if os.path.exists(downloads_path):
+        files = os.listdir(downloads_path)
+        for file in files:
+            if file.endswith(".mp4") or file.endswith(".webm") or \
+                file.endswith(".3gp") or file.endswith(".flv") or \
+                file.endswith(".mp3") or file.endswith(".m4a"):
+                to_upload_count += 1
+    
 
 
     status_string = '\n\n\n///////////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\' + \
                     '\n                                           Backup Summary                                               ' + \
                     '\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' + \
                     '\n>>>>>>>>>>> Successfuly downloaded: ' + str(successful_downloads) + '/' + str(downloaded_count) + ',  ' + \
-                    'Failed: ' + str(len(failed_download_list)) + '. <<<<<<<<<<<\n' + \
+                    'Failed: ' + str(len(failed_download_list)) + '. <<<<<<<<<<<' + \
                     '\n>>>>>>>>>>> Successfuly uploaded: ' + str(successful_uploads) + '/' + str(uploaded_count) + ',  '+ \
-                    'Failed: ' + str(len(failed_upload_list)) + '. <<<<<<<<<<<\n\n' + \
+                    'Failed: ' + str(len(failed_upload_list)) + '. <<<<<<<<<<<' + \
+                    '\n>>>>>>>>>>> To upload: ' + str(to_upload_count) + '\n' + \
                     'Failed download list saved to "' + str(failed_downloads_file) + ' .\n' + \
                     'Failed upload list saved to "' + str(failed_uploads_file) + ' .\n' + \
                     '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\/////////////////////////////////////////////////////\n\n\n'
@@ -184,7 +194,7 @@ def upload_downloaded_thread(ia_id, downloads_path):
     while not is_finished_downloading or not is_downloads_path_empty(downloads_path):
         print_status_string(ia_id, downloads_path)
         sleep(20)
-        stdout.write('\n=================is_uploading: ' + str(is_uploading))        
+        # stdout.write('\n=================is_uploading: ' + str(is_uploading))        
         if is_uploading:
             # pass
             stdout.write('\n')
@@ -327,7 +337,8 @@ def main():
 
                 elif ex.find('aria2c exited with code 16') > -1 :   
                     print('=======could not create new file or truncate existing file....')
-                    print('try running yt-archiver <Yotube_URL> <Archive_Identifier> -hid -hf')
+                    print('try running yt-archiver <Yotube_URL> <Archive_Identifier> -hd')
+                    is_finished_downloading = True
                     exit    
                 
                 elif ex.find('aria2c exited with code 17') > -1 :   
