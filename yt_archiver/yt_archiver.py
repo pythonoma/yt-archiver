@@ -167,12 +167,11 @@ def print_status_string(ia_id, downloads_path):
                     '\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' + \
                     '\n>>>>>>>>>>> Successfuly downloaded: ' + str(successful_downloads) + '/' + str(downloaded_count) + ',  ' + \
                     'Failed: ' + str(len(failed_download_list)) + '. <<<<<<<<<<<' + \
-                    '\n>>>>>>>>>>> Successfuly uploaded: ' + str(successful_uploads) + '/' + str(uploaded_count) + ',  '+ \
-                    'Failed: ' + str(len(failed_upload_list)) + '. <<<<<<<<<<<' + \
+                    '\n>>>>>>>>>>> Successfuly uploaded: ' + str(successful_uploads)  + ' videos. <<<<<<<<<<<' + \
                     '\n>>>>>>>>>>> To upload: ' + str(to_upload_count) + '\n' + \
-                    'Failed download list saved to "' + str(failed_downloads_file) + ' .\n' + \
-                    'Failed upload list saved to "' + str(failed_uploads_file) + ' .\n' + \
                     '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\/////////////////////////////////////////////////////\n\n\n'
+                    # 'Failed download list saved to "' + str(failed_downloads_file) + ' .\n' + \
+                    # 'Failed upload list saved to "' + str(failed_uploads_file) + ' .\n' + \
                     
     stdout.write(status_string)
     
