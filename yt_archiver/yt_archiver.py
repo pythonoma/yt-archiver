@@ -130,8 +130,8 @@ def yt_archiver(url, identifier, hide_date=False, hide_id=False, hide_format=Fal
     """
     ydl_opts = {
         # 'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-        # 'format': 'best',
-        'format': 'worst',
+        'format': 'best',
+        # 'format': 'worst',
         # 'ignoreerrors': 'True',
         'external_downloader': 'aria2c',
         'download_archive': os.path.join('downloads', identifier+ '.download-archive') , 
@@ -189,19 +189,53 @@ def main():
                 print('=======Download Error')
                 # print(ex)
                 ex = str(ex)
-                video_id_start = ex.find(":") +6
-                video_id_end = ex.find(":", video_id_start)
-                video_id = ex[video_id_start:video_id_end]
-                # if ex.find('account associated with this video has been terminated') > -1 :
                 if ex.find('aria2c exited with code 9') > -1 :   
                     print('=======No Space left on disk, uploading to free space...')               
                     upload_to_archive(ia_id, downloads_folder)
                     continue
-                else:
+                elif ex.find('aria2c exited with code 1') > -1 :   
+                    print('=======Unknown error occcured, Sleeping for 10 seconds and retrying...')               
+                    sleep(10)
+                    continue
+                
+                elif ex.find('aria2c exited with code 2') > -1 :   
+                    print('=======Connection timeout, Sleeping for 10 seconds and retrying...')               
+                    sleep(10)
+                    continue
+
+                elif ex.find('aria2c exited with code 6') > -1 :   
+                    print('=======Network proplem, Sleeping for 10 seconds and retrying...')               
+                    sleep(10)
+                    continue
+
+                elif ex.find('aria2c exited with code 15') > -1 :   
+                    print('=======Couldnot open existing file...')
+                    exit 
+
+                elif ex.find('aria2c exited with code 16') > -1 :   
+                    print('=======could not create new file or truncate existing file....')
+                    exit 
+                
+                elif ex.find('aria2c exited with code 17') > -1 :   
+                    print('=======file I/O error occurred.....')
+                    upload_to_archive(ia_id, downloads_folder)
+
+                elif ex.find('aria2c exited with code 18') > -1 :   
+                    print('=======aria2 could not create directory.....')
+                    exit 
+                    
+                elif ex.find('account associated with this video has been terminated') > -1 :
+                    video_id_start = ex.find(":") +6
+                    video_id_end = ex.find(":", video_id_start)
+                    video_id = ex[video_id_start:video_id_end]
                     if video_id != '':
                         skip_yt_video(video_id, ia_id)
                         continue
                 # elif ex.find('')
+            # except OSError as ex:
+            #     if ex.errno is 28:
+            #         print('No space left on disk, uploading')
+            #         exit
             except Exception as ex:
                 print(ex)
                 print("Download error occured...")
