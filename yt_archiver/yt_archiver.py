@@ -149,7 +149,8 @@ def is_downloads_path_empty(downloads_path):
 
 
 def print_status_string(ia_id, downloads_path):
-     while not is_finished_downloading or not is_downloads_path_empty(downloads_path):
+    global is_finished_downloading
+    while not is_finished_downloading or not is_downloads_path_empty(downloads_path):
         sleep(10)
         global uploaded_count, failed_upload_list, downloaded_count, failed_download_list
         successful_downloads = downloaded_count - len(failed_download_list)
