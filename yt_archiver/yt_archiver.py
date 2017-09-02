@@ -135,46 +135,6 @@ def my_hook(d):
         stdout.flush()
         sleep(1) # move the cursor to the next line
 
-
-def print_status_string(ia_id, downloads_path):
-    global uploaded_count, failed_upload_list, downloaded_count, failed_download_list
-    successful_downloads = downloaded_count - len(failed_download_list)
-    successful_uploads = uploaded_count - len(failed_upload_list)
-    failed_downloads_file = os.path.join('downloads', ia_id + '.failed_downloads')
-    failed_uploads_file = os.path.join('downloads', ia_id + '.failed_uploads')
-    
-    with open( failed_downloads_file, 'w') as f:
-        for v in failed_download_list:
-            f.write(v + '\n')
-    
-    with open( failed_uploads_file, 'w') as f:
-        for v in failed_upload_list:
-            f.write(v + '\n')
-    
-    to_upload_count = 0
-    if os.path.exists(downloads_path):
-        files = os.listdir(downloads_path)
-        for file in files:
-            if file.endswith(".mp4") or file.endswith(".webm") or \
-                file.endswith(".3gp") or file.endswith(".flv") or \
-                file.endswith(".mp3") or file.endswith(".m4a"):
-                to_upload_count += 1
-    
-
-
-    status_string = '\n\n\n///////////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\' + \
-                    '\n                                           Backup Summary                                               ' + \
-                    '\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' + \
-                    '\n>>>>>>>>>>> Successfuly downloaded: ' + str(successful_downloads) + '/' + str(downloaded_count) + ',  ' + \
-                    'Failed: ' + str(len(failed_download_list)) + '. <<<<<<<<<<<' + \
-                    '\n>>>>>>>>>>> Successfuly uploaded: ' + str(successful_uploads)  + ' videos. <<<<<<<<<<<' + \
-                    '\n>>>>>>>>>>> To upload: ' + str(to_upload_count) + '\n' + \
-                    '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\/////////////////////////////////////////////////////\n\n\n'
-                    # 'Failed download list saved to "' + str(failed_downloads_file) + ' .\n' + \
-                    # 'Failed upload list saved to "' + str(failed_uploads_file) + ' .\n' + \
-                    
-    stdout.write(status_string)
-    
 def is_downloads_path_empty(downloads_path):
     if os.path.exists(downloads_path):
         files = os.listdir(downloads_path)
@@ -187,12 +147,54 @@ def is_downloads_path_empty(downloads_path):
     else:
         return True
 
+
+def print_status_string(ia_id, downloads_path):
+     while not is_finished_downloading or not is_downloads_path_empty(downloads_path):
+        sleep(10)
+        global uploaded_count, failed_upload_list, downloaded_count, failed_download_list
+        successful_downloads = downloaded_count - len(failed_download_list)
+        successful_uploads = uploaded_count - len(failed_upload_list)
+        failed_downloads_file = os.path.join('downloads', ia_id + '.failed_downloads')
+        failed_uploads_file = os.path.join('downloads', ia_id + '.failed_uploads')
+        
+        with open( failed_downloads_file, 'w') as f:
+            for v in failed_download_list:
+                f.write(v + '\n')
+        
+        with open( failed_uploads_file, 'w') as f:
+            for v in failed_upload_list:
+                f.write(v + '\n')
+        
+        to_upload_count = 0
+        if os.path.exists(downloads_path):
+            files = os.listdir(downloads_path)
+            for file in files:
+                if file.endswith(".mp4") or file.endswith(".webm") or \
+                    file.endswith(".3gp") or file.endswith(".flv") or \
+                    file.endswith(".mp3") or file.endswith(".m4a"):
+                    to_upload_count += 1
+        
+
+
+        status_string = '\n\n\n///////////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\' + \
+                        '\n                                           Backup Summary                                               ' + \
+                        '\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' + \
+                        '\n>>>>>>>>>>> Successfuly downloaded: ' + str(successful_downloads) + '/' + str(downloaded_count) + ',  ' + \
+                        'Failed: ' + str(len(failed_download_list)) + '. <<<<<<<<<<<' + \
+                        '\n>>>>>>>>>>> Successfuly uploaded: ' + str(successful_uploads)  + ' videos. <<<<<<<<<<<' + \
+                        '\n>>>>>>>>>>> To upload: ' + str(to_upload_count) + '\n' + \
+                        '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\/////////////////////////////////////////////////////\n\n\n'
+                        # 'Failed download list saved to "' + str(failed_downloads_file) + ' .\n' + \
+                        # 'Failed upload list saved to "' + str(failed_uploads_file) + ' .\n' + \
+                        
+        stdout.write(status_string)
+        
+
 def upload_downloaded_thread(ia_id, downloads_path):
     global is_finished_downloading, is_uploading
 
     while not is_finished_downloading or not is_downloads_path_empty(downloads_path):
-        print_status_string(ia_id, downloads_path)
-        sleep(20)
+        sleep(10)
         # stdout.write('\n=================is_uploading: ' + str(is_uploading))        
         if is_uploading:
             # pass
@@ -267,9 +269,7 @@ def yt_archiver(url, identifier, hide_date=False, hide_id=True, hide_format=True
     
     ydl_opts['outtmpl'] = output_t + '.%(ext)s'
 
-    background_thread = threading.Thread(target=upload_downloaded_thread, args=(identifier, downloads_path,))
-    background_thread.start()
-
+    
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         print('============================')
         print('Downloading Youtube videos...')
@@ -300,6 +300,12 @@ def main():
 
     downloads_folder = os.path.join('downloads', ia_id)
     if create_archive_identifier(ia_id):
+        background_thread = threading.Thread(target=upload_downloaded_thread, args=(ia_id, downloads_folder,))
+        background_thread.start()
+        
+        background_thread = threading.Thread(target=print_status_string, args=(ia_id, downloads_folder,))
+        background_thread.start()
+
         while True:
             try:
                 yt_archiver(yt_url, ia_id, hide_date=arg_hide_date, hide_id=arg_hide_id, hide_format=arg_hide_format)
