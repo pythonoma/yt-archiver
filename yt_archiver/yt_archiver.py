@@ -19,6 +19,7 @@ from time import sleep
 
 is_finished_downloading = False
 is_uploading = False
+bypass_long_filename = False
 
 downloaded_count = 0
 uploaded_count = 0
@@ -114,6 +115,16 @@ class MyLogger(object):
         print(msg)
 
 
+def bypass_long_filename_hook(d):
+    if d['status'] == 'finished':
+        print('*************************************************************')
+        print('=>>> Bypassed filename error & Downloaded ' + d['filename'])
+        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        global downloaded_count 
+        downloaded_count +=1
+        sys.exit() # terminate download & don't continue downloading with these options
+
+
 def my_hook(d):
     if d['status'] == 'finished':
         print('*************************************************************')
@@ -121,7 +132,7 @@ def my_hook(d):
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
         global downloaded_count 
         downloaded_count +=1
-
+            
     if d['status'] == 'error':
         global failed_download_list
         failed_download_list.append(d['filename'])
@@ -151,7 +162,7 @@ def is_downloads_path_empty(downloads_path):
 def print_status_string(ia_id, downloads_path):
     global is_finished_downloading
     while not is_finished_downloading or not is_downloads_path_empty(downloads_path):
-        sleep(10)
+        sleep(20)
         global uploaded_count, failed_upload_list, downloaded_count, failed_download_list
         successful_downloads = downloaded_count - len(failed_download_list)
         successful_uploads = uploaded_count - len(failed_upload_list)
@@ -235,6 +246,24 @@ def upload_downloaded_thread(ia_id, downloads_path):
                 is_uploading = False            
 
       
+def bypass_long_filename_thread(url, ia_id):
+    downloads_path = os.path.join(os.getcwd()+ '/downloads', ia_id)
+    ydl_opts2 = {
+        # 'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+        'format': 'best',
+        # 'format': 'worst',
+        # 'ignoreerrors': 'True',
+        'external_downloader': 'aria2c',
+        'download_archive': downloads_path+ '.download-archive' , 
+        'logger': MyLogger(),
+        'progress_hooks': [bypass_long_filename_hook],
+    }
+    ydl_opts2['outtmpl'] = downloads_path + '/%(upload_date)s-TOO_LONG_TITLE__%(id)s.%(ext)s'
+
+    with youtube_dl.YoutubeDL(ydl_opts2) as ydl2:
+        print('============================')
+        print('Bypassing Long title error...')
+        ydl2.download([url])
 
 
 def yt_archiver(url, identifier, hide_date=False, hide_id=True, hide_format=True):
@@ -262,6 +291,7 @@ def yt_archiver(url, identifier, hide_date=False, hide_id=True, hide_format=True
     output_t = downloads_path + '/'
     if not hide_date:
         output_t += '%(upload_date)s-'
+
     output_t += '%(title)s'
     if not hide_id:
         output_t += '__%(id)s'
@@ -297,21 +327,20 @@ def main():
     arg_hide_date = args['hidedate']
     arg_hide_format = args['hideformat']
 
-    delete_none_completed_videos(ia_id)
+    #delete_none_completed_videos(ia_id)
 
     downloads_folder = os.path.join('downloads', ia_id)
     if create_archive_identifier(ia_id):
-        background_thread = threading.Thread(target=upload_downloaded_thread, args=(ia_id, downloads_folder,))
-        background_thread.start()
+        bg_upload_downloaded_thread = threading.Thread(target=upload_downloaded_thread, args=(ia_id, downloads_folder,))
+        bg_upload_downloaded_thread.start()
         
-        background_thread = threading.Thread(target=print_status_string, args=(ia_id, downloads_folder,))
-        background_thread.start()
+        bg_print_status_string_thread = threading.Thread(target=print_status_string, args=(ia_id, downloads_folder,))
+        bg_print_status_string_thread.start()
 
         while True:
             try:
                 yt_archiver(yt_url, ia_id, hide_date=arg_hide_date, hide_id=arg_hide_id, hide_format=arg_hide_format)
                 print('===Finished Downloading==========')
-                print_status_string(ia_id,downloads_folder)
                 global is_finished_downloading
                 is_finished_downloading = True
                 # No errors occured during download, Upload them...
@@ -343,14 +372,22 @@ def main():
 
                 elif ex.find('aria2c exited with code 16') > -1 :   
                     print('=======could not create new file or truncate existing file....')
-                    print('try running yt-archiver <Yotube_URL> <Archive_Identifier> -hd')
-                    is_finished_downloading = True
-                    exit    
-                
+                    # print('try running yt-archiver <Yotube_URL> <Archive_Identifier> -hd')
+                    # global is_finished_downloading
+                    # is_finished_downloading = True
+                    # exit    
+                    print('Using a short file name.')
+                    bg_bypass_long_filename_thread = threading.Thread(target=bypass_long_filename_thread, args=(yt_url, ia_id,))
+                    bg_bypass_long_filename_thread.start()
+                    bg_bypass_long_filename_thread.join()
+                    continue
+
+
                 elif ex.find('aria2c exited with code 17') > -1 :   
                     print('=======file I/O error occurred, sleeping 10 seconds.....')
                     # upload_to_archive(ia_id, downloads_folder)
                     sleep(10)
+                    exit
 
 
                 elif ex.find('aria2c exited with code 18') > -1 :   
