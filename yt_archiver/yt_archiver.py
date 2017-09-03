@@ -15,11 +15,13 @@ import threading
 # from archive_uploader import upload_to_archive
 
 from sys import stdout
-from time import sleep
+from time import sleep, strftime, gmtime
 
 is_finished_downloading = False
 is_uploading = False
+
 bypass_long_filename = False
+finished_downloading_first_video = False
 
 downloaded_count = 0
 uploaded_count = 0
@@ -27,6 +29,7 @@ failed_download_list = []
 failed_upload_list = []
 
 cwd = os.getcwd()
+
 
 def create_archive_identifier( identifier):
     """
@@ -52,7 +55,8 @@ def create_archive_identifier( identifier):
     except Exception as ex:
         print(ex)
         return False
-    
+
+
 def create_test_file():
     """
     Creates a local '__.test' file.
@@ -63,6 +67,7 @@ def create_test_file():
     except Exception as ex:
         print(ex)
         print('Failed to create test file at archive.org.')
+
 
 def upload_to_archive(identifier, files_folder, auto_delete=True, verbose=True):
     """
@@ -104,7 +109,19 @@ def delete_none_completed_videos(ia_id):
                     print(ex)
                     print('Failed to remove none completed video files.')
 
+
 class MyLogger(object):
+    def debug(self, msg):
+        pass
+
+    def warning(self, msg):
+        pass
+
+    def error(self, msg):
+        print(msg)
+
+        
+class MyLogger2(object):
     def debug(self, msg):
         pass
 
@@ -116,13 +133,21 @@ class MyLogger(object):
 
 
 def bypass_long_filename_hook(d):
-    if d['status'] == 'finished':
+    global finished_downloading_first_video, downloaded_count
+    print ('-->>> finished_downloading_first_video: ' + str(finished_downloading_first_video))
+    if finished_downloading_first_video:
         print('*************************************************************')
         print('=>>> Bypassed filename error & Downloaded ' + d['filename'])
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-        global downloaded_count 
-        downloaded_count +=1
-        sys.exit() # terminate download & don't continue downloading with these options
+        finished_downloading_first_video = False
+        sys.exit()  # terminate download & don't continue downloading with these options
+
+    if d['status'] == 'finished':
+        finished_downloading_first_video = True  
+        downloaded_count += 1
+    
+   
+    
 
 
 def my_hook(d):
@@ -141,10 +166,11 @@ def my_hook(d):
     #     stdout.write("\n")
     
     if d['status'] == 'downloading':
-        txt = d['filename'] + d['_percent_str'] + ' || '+  d['_eta_str']
+        txt = d['filename'] + d['_percent_str'] + ' || ' + d['_eta_str']
         stdout.write("\r%s" % txt)
         stdout.flush()
         sleep(1) # move the cursor to the next line
+
 
 def is_downloads_path_empty(downloads_path):
     if os.path.exists(downloads_path):
@@ -152,7 +178,7 @@ def is_downloads_path_empty(downloads_path):
         for file in files:
             if file.endswith(".mp4") or file.endswith(".webm") or \
                 file.endswith(".3gp") or file.endswith(".flv") or \
-                file.endswith(".mp3") or file.endswith(".m4a"):
+                    file.endswith(".mp3") or file.endswith(".m4a"):
                 return False
         return True
     else:
@@ -183,13 +209,14 @@ def print_status_string(ia_id, downloads_path):
             for file in files:
                 if file.endswith(".mp4") or file.endswith(".webm") or \
                     file.endswith(".3gp") or file.endswith(".flv") or \
-                    file.endswith(".mp3") or file.endswith(".m4a"):
+                        file.endswith(".mp3") or file.endswith(".m4a"):
                     to_upload_count += 1
         
 
 
         status_string = '\n\n\n///////////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\' + \
                         '\n                                           Backup Summary                                               ' + \
+                        '\n                                   ' + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + '                      ' + \
                         '\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' + \
                         '\n>>>>>>>>>>> Successfuly downloaded: ' + str(successful_downloads) + '/' + str(downloaded_count) + ',  ' + \
                         'Failed: ' + str(len(failed_download_list)) + '. <<<<<<<<<<<' + \
@@ -223,7 +250,7 @@ def upload_downloaded_thread(ia_id, downloads_path):
                 for file in files:
                     if file.endswith(".mp4") or file.endswith(".webm") or \
                         file.endswith(".3gp") or file.endswith(".flv") or \
-                        file.endswith(".mp3") or file.endswith(".m4a"):
+                            file.endswith(".mp3") or file.endswith(".m4a"):
                         try:
                             filepath = os.path.join(downloads_path, file)
                             is_uploading = True
@@ -248,14 +275,15 @@ def upload_downloaded_thread(ia_id, downloads_path):
       
 def bypass_long_filename_thread(url, ia_id):
     downloads_path = os.path.join(os.getcwd()+ '/downloads', ia_id)
+    print('====>>>> bypass_long_filename_thread: ' + downloads_path + '.download-archive')
     ydl_opts2 = {
         # 'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
         'format': 'best',
         # 'format': 'worst',
         # 'ignoreerrors': 'True',
         'external_downloader': 'aria2c',
-        'download_archive': downloads_path+ '.download-archive' , 
-        'logger': MyLogger(),
+        'download_archive': downloads_path+ '.download-archive' ,
+        'logger': MyLogger2(),
         'progress_hooks': [bypass_long_filename_hook],
     }
     ydl_opts2['outtmpl'] = downloads_path + '/%(upload_date)s-TOO_LONG_TITLE__%(id)s.%(ext)s'
@@ -311,6 +339,7 @@ def skip_yt_video(video_id, identifier):
     print("Skipping "+ video_id)
     with open(os.path.join('downloads', identifier+ '.download-archive'), 'a') as f:
         f.write('youtube '+ video_id +'\n')
+
 
 def main():
     parser = argparse.ArgumentParser(description='Backup Youtube Channels to archive.org')
@@ -380,7 +409,7 @@ def main():
                     bg_bypass_long_filename_thread = threading.Thread(target=bypass_long_filename_thread, args=(yt_url, ia_id,))
                     bg_bypass_long_filename_thread.start()
                     bg_bypass_long_filename_thread.join()
-                    continue
+                    # continue
 
 
                 elif ex.find('aria2c exited with code 17') > -1 :   
