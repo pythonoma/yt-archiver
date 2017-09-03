@@ -53,13 +53,13 @@ def print_status_string(ia_id, downloads_path):
         failed_downloads_file = os.path.join('downloads', ia_id + '.failed_downloads')
         failed_uploads_file = os.path.join('downloads', ia_id + '.failed_uploads')
         
-        with open( failed_downloads_file, 'w') as f:
-            for v in failed_download_list:
-                f.write(v + '\n')
+        # with open( failed_downloads_file, 'w') as f:
+        #     for v in failed_download_list:
+        #         f.write(v + '\n')
         
-        with open( failed_uploads_file, 'w') as f:
-            for v in failed_upload_list:
-                f.write(v + '\n')
+        # with open( failed_uploads_file, 'w') as f:
+        #     for v in failed_upload_list:
+        #         f.write(v + '\n')
         
         to_upload_count = 0
         if os.path.exists(downloads_path):
@@ -72,15 +72,14 @@ def print_status_string(ia_id, downloads_path):
         
 
 
-        status_string = '\n\n\n///////////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\' + \
-                        '\n                                           Backup Summary                                               ' + \
-                        '\n                                   ' + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + '                      ' + \
-                        '\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' + \
-                        '\n>>>>>>>>>>> Successfuly downloaded: ' + str(successful_downloads) + '/' + str(downloaded_count) + ',  ' + \
-                        'Failed: ' + str(len(failed_download_list)) + '. <<<<<<<<<<<' + \
-                        '\n>>>>>>>>>>> Successfuly uploaded: ' + str(successful_uploads)  + ' videos. <<<<<<<<<<<' + \
-                        '\n>>>>>>>>>>> To upload: ' + str(to_upload_count) + '\n' + \
-                        '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\/////////////////////////////////////////////////////\n\n\n'
+        status_string = '\n\n\n///////////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\' + \
+                        '\n                            Backup Summary   ' + \
+                        '\n                         ' + strftime("%Y-%m-%d %H:%M:%S", gmtime())  + \
+                        '\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' + \
+                        '\n>>>>>>>>>>> Downloaded: ' + str(successful_downloads) + '/' + str(downloaded_count) + ',  ' + \
+                        str(len(failed_download_list)) + ' Failed.     <<<<<<<' + \
+                        '\n>>>>>>>>>>> Uploaded  : ' + str(successful_uploads)  + ',    ' + str(to_upload_count) + ' Pending.    <<<<<<<' + \
+                        '\n\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////\n\n\n'
                         # 'Failed download list saved to "' + str(failed_downloads_file) + ' .\n' + \
                         # 'Failed upload list saved to "' + str(failed_uploads_file) + ' .\n' + \
                         
@@ -107,7 +106,7 @@ def create_archive_identifier( identifier):
         item.upload('__.test', metadata=md, delete=True)
         item.modify_metadata(md)
         archive_delete(identifier, files='__.test')
-        print('Identifier created.')
+        print('Identifier available.')
         return True
     except Exception as ex:
         print(ex)
@@ -126,26 +125,6 @@ def create_test_file():
         print('Failed to create test file at archive.org.')
 
 
-def upload_to_archive(identifier, files_folder, auto_delete=True, verbose=True):
-    """
-    Upload files in 'files_folder' to Archive.org 'identifier' with metadata='movies'.
-
-    Optional args:
-    auto_delete: auto delete uploaded files after verifying they are uploaded.
-    verbose: display upload progress.
-    """
-    delete_none_completed_videos(identifier)
-
-    item = get_item(identifier)
-    md = dict(mediatype='movies',)
-    try:
-        item.upload(files_folder+'/', metadata=md, delete=auto_delete, verbose=verbose, checksum=True)
-        print("Finished uploading. Item available at https://archive.org/details/" + identifier)
-    except Exception as ex:
-        print(ex)
-        print('Error Uploading')
-
-
 class MyYoutubeDLM(youtube_dl.YoutubeDL):
 
     def prepare_filename(self, info_dict):
@@ -160,8 +139,9 @@ class MyYoutubeDLM(youtube_dl.YoutubeDL):
         ext = os.path.splitext(filename_with_ext)[1]
 
         filename_encoded = filename_without_ext.encode('utf-8')
-        filename_encoded_short = filename_encoded[:245]
-        filename_decoded_short = filename_encoded_short.decode('utf-8') + ext
+        
+        filename_encoded_short = filename_encoded[:240]
+        filename_decoded_short = filename_encoded_short.decode('utf-8', errors='replace') + ext
 
         short_sanitized_path = os.path.join(os.path.dirname(sanitized_path), filename_decoded_short)
         return short_sanitized_path
@@ -209,12 +189,12 @@ def upload_downloaded_thread(ia_id, downloads_path):
         sleep(10)
         # stdout.write('\n=================is_uploading: ' + str(is_uploading))        
         if is_uploading:
-            # pass
-            stdout.write('\n')
-            print('=====uploading, skipping check')
+            pass
+            # stdout.write('\n')
+            # print('=====uploading, skipping check')
         else:
             # stdout.write('\n')
-            print('=====Upload thread checking:' + downloads_path)
+            # print('=====Upload thread checking:' + downloads_path)
             item = get_item(ia_id)
             md = dict(mediatype='movies',)
 
@@ -243,7 +223,9 @@ def upload_downloaded_thread(ia_id, downloads_path):
                             print('==========================================================')
                             global failed_upload_list 
                             failed_upload_list.append(filepath)
-                is_uploading = False            
+                is_uploading = False      
+    else:
+        print("\n\nFinished uploading. Item available at https://archive.org/details/" + ia_id)      
 
 
 def yt_archiver(url, identifier, hide_date=False, hide_id=True, hide_format=True):
