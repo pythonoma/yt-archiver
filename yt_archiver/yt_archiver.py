@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import argparse
 
 from youtube_dl.utils import DownloadError
-from internetarchive import get_item, upload
+from internetarchive import get_item, upload, get_files
 from internetarchive import delete as archive_delete
 
 import youtube_dl
@@ -16,6 +16,7 @@ import threading
 
 from sys import stdout
 from time import sleep, strftime, gmtime
+from datetime import datetime, timedelta
 
 is_finished_downloading = False
 is_uploading = False
@@ -24,11 +25,24 @@ bypass_long_filename = False
 finished_downloading_first_video = False
 
 downloaded_count = 0
+total_downloads_count = 0
+cur_video_id = ''
+
 uploaded_count = 0
 failed_download_list = []
 failed_upload_list = []
 
-# cwd = os.getcwd()
+time_started = datetime.now()
+
+
+def chop_microseconds(delta):
+    return delta - timedelta(microseconds=delta.microseconds)
+
+
+def get_time_diff(start_time, end_time):
+    delta_time = end_time - start_time
+    return chop_microseconds(delta_time)
+
 
 def is_downloads_path_empty(downloads_path):
     if os.path.exists(downloads_path):
@@ -47,7 +61,7 @@ def print_status_string(ia_id, downloads_path):
     global is_finished_downloading
     while not is_finished_downloading or not is_downloads_path_empty(downloads_path):
         sleep(20)
-        global uploaded_count, failed_upload_list, downloaded_count, failed_download_list
+        global uploaded_count, failed_upload_list, downloaded_count, failed_download_list, total_downloads_count
         successful_downloads = downloaded_count - len(failed_download_list)
         successful_uploads = uploaded_count - len(failed_upload_list)
         failed_downloads_file = os.path.join('downloads', ia_id + '.failed_downloads')
@@ -71,12 +85,11 @@ def print_status_string(ia_id, downloads_path):
                     to_upload_count += 1
         
 
-
         status_string = '\n\n\n///////////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\' + \
                         '\n                            Backup Summary   ' + \
                         '\n                         ' + strftime("%Y-%m-%d %H:%M:%S", gmtime())  + \
                         '\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~' + \
-                        '\n>>>>>>>>>>> Downloaded: ' + str(successful_downloads) + '/' + str(downloaded_count) + ',  ' + \
+                        '\n>>>>>>>>>>> Downloaded: ' + str(successful_downloads) + '/' + str(total_downloads_count) + ',  ' + \
                         str(len(failed_download_list)) + ' Failed.     <<<<<<<' + \
                         '\n>>>>>>>>>>> Uploaded  : ' + str(successful_uploads)  + ',    ' + str(to_upload_count) + ' Pending.    <<<<<<<' + \
                         '\n\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////\n\n\n'
@@ -84,7 +97,11 @@ def print_status_string(ia_id, downloads_path):
                         # 'Failed upload list saved to "' + str(failed_uploads_file) + ' .\n' + \
                         
         stdout.write(status_string)
-        
+        sleep(5)
+
+
+def get_ia_item_files_count(ia_id, formats=['WebM', 'MPEG4', '3GP']):
+    return len(list(get_files(ia_id, formats=formats)))
 
 
 def create_archive_identifier( identifier):
@@ -147,16 +164,47 @@ class MyYoutubeDLM(youtube_dl.YoutubeDL):
         return short_sanitized_path
 
 
-
 class MyLogger(object):
+    # '[download] Downloading video 2174 of 4862'
+    downloading_string = '[download] Downloading video '
+    of_string = ' of '
+
+    # '[youtube] ZdFnQwKTdiE: Downloading MPD manifest'
+    downloading_webpage_string = ': Downloading MPD manifest'
+    string_befor_video_id = '[youtube] '
+
     def debug(self, msg):
-        pass
+        global downloaded_count, total_downloads_count
+        msg = str(msg)
+        # print('===Debug: ' + msg)
+
+        downloaded_string_start = msg.find(self.downloading_string)
+        downloading_webpage_start = msg.find(self.downloading_webpage_string)
+
+        if downloaded_string_start > -1:
+            downloaded_number_start = downloaded_string_start + len(self.downloading_string)
+            of_string_start = msg.find(self.of_string)
+            downloaded_number = msg[downloaded_number_start:of_string_start]
+
+            total_number_start = of_string_start + len(self.of_string)
+            total_number = msg[total_number_start:]
+
+            # print('Already Downloaded: ' + downloaded_number + '/' + total_number)
+            downloaded_count = int(downloaded_number)
+            total_downloads_count = int(total_number)
+        # 'errorCode=3 Resource not found'
+        elif downloading_webpage_start > -1:
+            global cur_video_id
+            cur_video_id_start = msg.find(self.string_befor_video_id) + len(self.string_befor_video_id)
+            cur_video_id = msg[cur_video_id_start:downloading_webpage_start]
+            print('current video: https://youtu.be/' + cur_video_id)
+
 
     def warning(self, msg):
         pass
 
     def error(self, msg):
-        print(msg)
+        print('=-=- Error: "' + str(msg) + '"')
 
 
 def my_hook(d):
@@ -181,9 +229,10 @@ def my_hook(d):
         sleep(1) # move the cursor to the next line
 
 
-
 def upload_downloaded_thread(ia_id, downloads_path):
-    global is_finished_downloading, is_uploading
+    global is_finished_downloading, is_uploading, uploaded_count 
+    
+    uploaded_count = get_ia_item_files_count(ia_id)
 
     while not is_finished_downloading or not is_downloads_path_empty(downloads_path):
         sleep(10)
@@ -213,7 +262,6 @@ def upload_downloaded_thread(ia_id, downloads_path):
                             print('**********************************************************')
                             print('uploaded: ' + str(file))
                             print('==========================================================')
-                            global uploaded_count 
                             uploaded_count += 1
                         except Exception as ex:
                             stdout.write('\n')
@@ -225,10 +273,12 @@ def upload_downloaded_thread(ia_id, downloads_path):
                             failed_upload_list.append(filepath)
                 is_uploading = False      
     else:
-        print("\n\nFinished uploading. Item available at https://archive.org/details/" + ia_id)      
+        global time_started
+        print("\n\nFinished uploading in " + str(get_time_diff(time_started, datetime.now())) + \
+              ". Item available at https://archive.org/details/" + ia_id)
 
 
-def yt_archiver(url, identifier, hide_date=False, hide_id=True, hide_format=True):
+def yt_archiver(url, identifier, hide_date=False, hide_id=True, hide_format=True, use_aria2c=True):
     """
     1. Download youtube playlist or channel from 'url' with 'best' quality using 'aria2c'.
     2. Upload downloaded videos to Archive.org 'identifier'
@@ -245,11 +295,14 @@ def yt_archiver(url, identifier, hide_date=False, hide_id=True, hide_format=True
         'format': 'best',
         # 'format': 'worst',
         # 'ignoreerrors': 'True',
-        'external_downloader': 'aria2c',
-        'download_archive': downloads_path+ '.download-archive' , 
+        'download_archive': downloads_path+ '.download-archive',
         'logger': MyLogger(),
         'progress_hooks': [my_hook],
+        # 'nocheckcertificate': True,  # Solve 'The TLS connection was non-properly terminated'
     }
+    if use_aria2c:
+        ydl_opts['external_downloader'] = 'aria2c'
+
     output_t = downloads_path + '/'
     if not hide_date:
         output_t += '%(upload_date)s-'
@@ -262,7 +315,6 @@ def yt_archiver(url, identifier, hide_date=False, hide_id=True, hide_format=True
     
     ydl_opts['outtmpl'] = output_t + '.%(ext)s'
 
-    
     with MyYoutubeDLM(ydl_opts) as ydl:
         print('============================')
         print('Downloading Youtube videos...')
@@ -290,7 +342,7 @@ def main():
     arg_hide_date = args['hidedate']
     arg_hide_format = args['hideformat']
 
-    #delete_none_completed_videos(ia_id)
+    # delete_none_completed_videos(ia_id)
 
     downloads_folder = os.path.join('downloads', ia_id)
     if create_archive_identifier(ia_id):
@@ -306,7 +358,7 @@ def main():
                 print('===Finished Downloading==========')
                 global is_finished_downloading
                 is_finished_downloading = True
-                # No errors occured during download, Upload them...
+                # No errors occurred during download, Upload them...
                 # upload_to_archive(ia_id, downloads_folder)
                 break
             except DownloadError as ex:
@@ -322,6 +374,13 @@ def main():
                 elif ex.find('aria2c exited with code 2') > -1 :   
                     print('=======Connection timeout, Sleeping for 10 seconds and retrying...')               
                     sleep(10)
+                    continue
+
+                elif ex.find('aria2c exited with code 3') > -1:
+                    global cur_video_id
+                    print('=======Resource Not Found, Downloading video https://youtu.be/' + cur_video_id + ' without aria2.')
+                    yt_archiver('https://youtu.be/'+str(cur_video_id), ia_id, hide_date=arg_hide_date, hide_id=arg_hide_id,
+                                hide_format=arg_hide_format, use_aria2c=False)
                     continue
 
                 elif ex.find('aria2c exited with code 6') > -1 :   
