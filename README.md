@@ -6,6 +6,8 @@ yt-archiver uses separate thread for uploading videos as they are being download
 
 **N.b:** Downloaded files are uploaded & deleted automatically to save disk space.
 
+**Intended to run & testes on Ubuntu 16.04 desktop & server. If you don't have a VPS,** <a href='https://github.com/pythonoma/yt-archiver/blob/master/README.md#best-to-run-on-vps-fast-downup-speeds'>**please Check THIS**</a>
+
 
 Update System:
 --------------------------------------------------------------------------------
