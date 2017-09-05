@@ -2,9 +2,7 @@
 
 Auto download Youtube channel or playlist & upload it to Archive.org page.
 
-yt-archiver is smart & can handle channels with xxxGb of content.
-
-yt-archiver uses separate thread for uploading videos as they are downloading, significantly decreasing time & disk space needed for backup.
+yt-archiver uses separate thread for uploading videos as they are being downloaded, significantly decreasing time & disk space needed for backup.
 
 **N.b:** Downloaded files are uploaded & deleted automatically to save disk space.
 
@@ -35,20 +33,36 @@ ia configure
 ```
 
 
-Run:
+(Optional) 
 ---------------------------------------------------------------------------------
+
+Recommended to run in ```tmux``` session, so it continues running on the server. 
+```
+tmux new -s SESSION_NAME
+```
+Now you can close your ssh connection & when you login back you can view the session by:
+```
+tmux attach -t SESSION_NAME
+```
+
+
+Run
+---------------------------------------------------------------------------------
+
 ```
 yt-archiver.py -u <Youtube_URL> -i <Archive_Page_Identifier>
 ```
-file name: uploadDate-Title
+file name: ```uploadDate-Title```
 
-ex: 20170503-My video title.mp4
+ex: ```20170503-My video title.mp4```
 
 
 ```
 yt-archiver.py -u <Youtube_URL> -i <Archive_Page_Identifier> -hd
 ```
-file name: Title
+file name: ```Title```
+
+ex: ```My video title.mp4```
 
 
 Best to run on VPS (fast down/up speeds). 
