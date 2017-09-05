@@ -2,7 +2,9 @@
 
 Auto download Youtube channel or playlist & upload it to Archive.org page.
 
-yt-archiver is smart & can handle channels with xxxGb of content; when disk space runs out, it uploads & deletes downloaded files to free disk space. Then continue downloading the channel & uploading etc...
+yt-archiver is smart & can handle channels with xxxGb of content.
+
+yt-archiver uses separate thread for uploading videos as they are downloading, significantly decreasing time & disk space needed for backup.
 
 **N.b:** Downloaded files are uploaded & deleted automatically to save disk space.
 
@@ -38,43 +40,23 @@ Run:
 ```
 yt-archiver.py -u <Youtube_URL> -i <Archive_Page_Identifier>
 ```
-file name: uploadDate-Title__videoId__videoFormat
+file name: uploadDate-Title
 
-```
-yt-archiver.py -u <Youtube_URL> -i <Archive_Page_Identifier> -hd -hid -hf
-```
-file name: Title
+ex: 20170503-My video title.mp4
 
 
 ```
 yt-archiver.py -u <Youtube_URL> -i <Archive_Page_Identifier> -hd
 ```
-file name: Title__videoId__videoFormat
+file name: Title
 
-```
-yt-archiver.py -u <Youtube_URL> -i <Archive_Page_Identifier> -hid
-```
-file name: uploadDate-Title__videoFormat
-
-```
-yt-archiver.py -u <Youtube_URL> -i <Archive_Page_Identifier> -hf
-```
-file name: uploadDate-Title__videoId
-
-FAQ:
-----------------------------------------------------------------------------
-
-Q: My free disk space is 15 GB & My channel has 50 videos about 50GB in size. How does it work?
-
-A: yt-archiver downloads first videos (ex: 1-15 ) till no disk space is left (~15GB), then uploads them to archive.org & deletes them to free disk space. 
-
-Then yt-archiver downloads the next 15 GB & uploads them etc.. till whole channel or playlist is backed up to archive.org
 
 Best to run on VPS (fast down/up speeds). 
---------------------------------------------------------------------------------
+----------------------------------------------------------------------------
 
-**I recommend the ones below which charge you per hour usage **
+**I recommend the ones below which charge you per hour usage**
 you can create a VPS, Backup your youtube videos & destroy the VPS => only charged for the hours you used not the whole month (usually a few cents!).
+
 
 <a href="https://m.do.co/c/224d827b0d9b"  target="_blank">**1. DigitalOcean**</a>
 
