@@ -6,7 +6,16 @@ yt-archiver uses separate thread for uploading videos as they are being download
 
 **N.b:** Downloaded files are uploaded & deleted automatically to save disk space.
 
-**Intended to run & tested on Ubuntu 16.04 desktop & server. If you don't have a VPS,** <a href='https://github.com/pythonoma/yt-archiver/blob/master/README.md#best-to-run-on-vps-fast-downup-speeds'>**please Check THIS**</a>
+**Intended to run & tested on Ubuntu 16.04 desktop & server. If you don't have a VPS,** <a href='#best-to-run-on-vps-fast-downup-speeds'>**please Check THIS**</a>
+
+
+Video tutorial:
+--------------------------------------------------------------------------------
+
+https://www.youtube.com/watch?v=_TwPJD-8Uhs
+
+
+[![Alt text](https://img.youtube.com/vi/_TwPJD-8Uhs/0.jpg)](https://www.youtube.com/watch?v=_TwPJD-8Uhs)
 
 
 Update System:
@@ -48,7 +57,7 @@ tmux attach -t SESSION_NAME
 ```
 
 
-Run
+Run Backup
 ---------------------------------------------------------------------------------
 
 ```
@@ -74,23 +83,27 @@ Best to run on VPS (fast down/up speeds).
 you can create a VPS, Backup your youtube videos & destroy the VPS => only charged for the hours you used not the whole month (usually a few cents!).
 
 
-<a href="https://m.do.co/c/224d827b0d9b"  target="_blank">**1. DigitalOcean**</a>
+<a href="http://bit.ly/do10dollars"  target="_blank">**1. DigitalOcean**</a>
 ------------------------------------------------------------------------------------
 
 The servers I tested this script on & it works fine (on Ubuntu 16.04 with 5$ droplet).
 
 Droplets (DigitalOcean VPS intances) start at 0.007$/hour (yes less than a cent/hour!):
 
-Get Free 10$ credit when you signup from this link: https://m.do.co/c/224d827b0d9b
+Get Free 10$ credit when you signup from this link: http://bit.ly/do10dollars
 
-<a href="https://m.do.co/c/224d827b0d9b" target="_blank"><img src="http://i.imgur.com/LVu6P6n.png"></a>
+<a href="http://bit.ly/do10dollars" target="_blank"><img src="http://i.imgur.com/LVu6P6n.png"></a>
 
 
-<a href="https://www.vultr.com/?ref=7208825"  target="_blank">**2. Vultr** </a>
+<a href="http://bit.ly/vultrhome"  target="_blank">**2. Vultr** </a>
 ------------------------------------------------------------------------------------
 Vultr has a 0.004$/hour plan, even less than DigitalOcean (although not always available):
 
-https://www.vultr.com/?ref=7208825
+-Home page: http://bit.ly/vultrhome
 
-<a href="https://www.vultr.com/?ref=7208825"  target="_blank"><img src="https://www.vultr.com/media/banner_1.png" width="728" height="90"></a>
+-Coupons & offers: http://bit.ly/vultrcoupons
+
+-Plans & pricing: http://bit.ly/vultrpricing
+
+<a href="http://bit.ly/vultrhome"  target="_blank"><img src="https://www.vultr.com/media/banner_1.png" width="728" height="90"></a>
 
