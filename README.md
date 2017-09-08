@@ -83,16 +83,16 @@ Best to run on VPS (fast down/up speeds).
 you can create a VPS, Backup your youtube videos & destroy the VPS => only charged for the hours you used not the whole month (usually a few cents!).
 
 
-<a href="http://bit.ly/do10dollars"  target="_blank">**1. DigitalOcean**</a>
+<a href="http://bit.ly/DO10dollars" target="_blank">**1. DigitalOcean**</a>
 ------------------------------------------------------------------------------------
 
 The servers I tested this script on & it works fine (on Ubuntu 16.04 with 5$ droplet).
 
 Droplets (DigitalOcean VPS intances) start at 0.007$/hour (yes less than a cent/hour!):
 
-Get Free 10$ credit when you signup from this link: http://bit.ly/do10dollars
+Get Free 10$ credit when you signup from this link: http://bit.ly/DO10dollars
 
-<a href="http://bit.ly/do10dollars" target="_blank"><img src="http://i.imgur.com/LVu6P6n.png"></a>
+<a href="http://bit.ly/DO10dollars" target="_blank"><img src="http://i.imgur.com/LVu6P6n.png"></a>
 
 
 <a href="http://bit.ly/vultrhome"  target="_blank">**2. Vultr** </a>
